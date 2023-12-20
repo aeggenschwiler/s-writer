@@ -1,0 +1,8 @@
+{
+  "sampleData": {
+    "320e2ae5-cd80-40dd-82e0-80f16f1704fe": {
+      "vars-SuccessPayload": "sample_data/list_java.dwl",
+      "vars-Result": "sample_data/defaultstringtype.dwl"
+    }
+  }
+}

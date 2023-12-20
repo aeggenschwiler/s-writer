@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:file="http://www.mulesoft.org/schema/mule/file"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd 
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd 
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="5babc5b2-6eb2-410d-8b4e-4b53272fdf81" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<flow name="s-filewriterFlow" doc:id="2348d90e-0363-405c-a5c4-56c85be38d15" >
+		<http:listener doc:name="Listener" doc:id="8b219965-41c4-4c2e-a51d-a9aeaf134f5c" config-ref="HTTP_Listener_config" path="/in" allowedMethods="POST" outputMimeType="text/csv; streaming=true; header=true">
+			<http:response statusCode="201">
+				<http:body ><![CDATA[#['none.']]]></http:body>
+			</http:response>
+		</http:listener>
+		<ee:transform doc:name="Transform Message" doc:id="320e2ae5-cd80-40dd-82e0-80f16f1704fe" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+@StreamCapable()
+input payload application/csv streaming=true
+output application/json deferred=true
+
+fun totFun( arg: Object): Object =  
+    if( floor(random() * 4) == 0 )
+        {
+            "errorMsg": "failed",
+        } ++ (arg mapObject( v,k,i) -> { (k) : "" })
+    else
+        {
+            "errorMsg": "",
+        } ++ arg
+
+---
+ payload filter ($$ >=2) map (row) ->  {"ind": "$$"} ++ totFun(row)]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<file:write doc:name="Write" doc:id="8bb7b8c2-1f83-4369-9540-bf455871fed7" path="#['/tmp/fileStream//out/out.csv']">
+		</file:write>
+
+	</flow>
+</mule>
