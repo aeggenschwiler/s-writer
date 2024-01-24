@@ -8,6 +8,8 @@ This repository provides a Mule applciation which
 * Does some Dataweave transformations
 * Writes the result to the disk.
 
+The app can be fed using the companion "s-streamer" app.
+
 == Running the app
 
 The app was deployed to a Studio Mule runtime (5.4.3). The maximum heap size was set to 512m.
